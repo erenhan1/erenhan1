@@ -1,6 +1,6 @@
 class HashTable:
     def __init__(self):
-        self.MAX = 10
+        self.MAX = 10 #You can create your own array
         self.arr = [[] for i in range(self.MAX)]
         
     def get_hash(self,key):
@@ -12,7 +12,7 @@ class HashTable:
         h = self.get_hash(key)
         found = False
         for idx, element in enumerate(self.arr[h]):
-            if len(element)==2 and element[0]==key:
+            if len(element)==2 and element[0]==key: #if the hashed index matching with new key this will link and add second value.
                 self.arr[h][idx] = (key,value)
                 found = True
                 break
