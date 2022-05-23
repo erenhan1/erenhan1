@@ -1,0 +1,77 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import pandas as pd
+
+ti=[]
+co=[]
+pr=[]
+sh=[]
+ho=[]
+lo=[]
+ra=[]
+main=[]
+
+headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.60 Safari/537.36'}
+#a={'title':ti,'condition':co,'price':pr, 'shipping':sh,'hotness':ho, 'location':lo}
+def ebay(tag,page):
+    url = 'https://www.ebay.com/sch/i.html?_from=R40&_nkw='+tag+'&_sacat=0&_pgn='+ str(page)
+    r = requests.get(url, headers = headers)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    box = soup.find_all('div',{'class':'s-item__wrapper clearfix'})
+
+    for item in box:
+
+            try:
+                title = item.find('h3',{'class':'s-item__title'}).text
+            except:
+                title='N/A'
+            try:  
+                condition = item.find('span',{'class':'SECONDARY_INFO'}).text
+            except:
+                condition='N/A'
+            try:
+                price = item.find('span',{'class':'s-item__price'}).text
+            except:
+                price='N/A'
+            try:
+                shipping = item.find('span',{'class':'s-item__shipping s-item__logisticsCost'}).text
+            except:
+                shipping = 'N/A'
+
+            try:
+                hotness = item.find('span',{'class':'BOLD'}).text
+            except:
+                hotness = 'N/A'
+
+            try:
+                location = item.find('span',{'class':'s-item__location s-item__itemLocation'}).text
+            except:
+                location = 'N/A'
+            
+            try:
+                rating = item.find('span',{'class':'s-item__reviews-count'}).text
+            except:
+                rating = 'N/A'
+            
+
+
+            ti.append(title)
+            co.append(condition)
+            pr.append(price)
+            sh.append(shipping)
+            ho.append(hotness)
+            lo.append(location)
+            ra.append(rating)
+    return
+        
+        
+
+k=int(input('Start Page:'))
+m=int(input('End Page:'))
+c=input('Keyword:')
+for x in range(k,m):
+    ebay(c,x)
+a={'title':ti,'condition':co,'price':pr, 'shipping':sh,'hotness':ho, 'location':lo,'product rating':ra}
+df= pd.DataFrame(a)
+df
