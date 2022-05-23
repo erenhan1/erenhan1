@@ -1,0 +1,32 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import pandas as pd
+
+
+headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.60 Safari/537.36'}
+list=[]
+def getquestions(tag, page):
+    url = 'https://stackoverflow.com/questions/tagged/{tag}?tab=active&page={page}&pagesize=50'
+    r = requests.get(url, headers = headers)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    questions = soup.find_all('div',{'class':'s-post-summary js-post-summary'})
+    for item in questions:
+        df= {
+        'title' : item.find('a',{'class':'s-link'}).text,
+        'link' : 'https://stackoverflow.com' + item.find('a',{'class':'s-link'})['href'],
+        'vote' : int(item.find('span',{'class':'s-post-summary--stats-item-number'}).text),
+        'date' : item.find('span',{'class':'relativetime'})['title']
+        }
+        list.append(df)
+        
+    return
+
+a=int(input('Start Page:'))
+b=int(input('End Page:'))
+c=input('Keyword:')
+for x in range(a,b):
+    getquestions(c,x)
+df= pd.DataFrame(list)
+df.date= pd.to_datetime(df.date)
+df
