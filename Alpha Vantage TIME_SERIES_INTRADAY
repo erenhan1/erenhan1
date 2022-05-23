@@ -1,0 +1,23 @@
+import requests
+import pandas as pd
+import numpy as np
+company = input('Enter the symbol of company you are looking for: ')
+url = f'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={company}&interval=5min&apikey=HPRUM92B9ZEIN39U&outputsize=full'
+r = requests.get(url)
+data = r.json()
+
+df = pd.DataFrame(data)
+meta = df[0:6]
+df = df[6:]
+df.reset_index(inplace = True)
+df.rename(columns={'index':'Interval'},inplace=True)
+del df['Meta Data']
+df = df.join(df['Time Series (5min)'].apply(pd.Series))
+del df['Time Series (5min)']
+df.columns = ['Interval', 'open', 'high', 'low', 'close', 'volume']
+df['symbol'] = np.repeat(meta.iloc[1:2,0:]['Meta Data'][0],len(df))
+df['last_refreshed'] = np.repeat(meta.iloc[2:3,0:]['Meta Data'][0],len(df))
+df.Interval = pd.to_datetime(df.Interval)
+df.last_refreshed = pd.to_datetime(df.last_refreshed)
+df = df.sort_values(by='Interval')
+df
